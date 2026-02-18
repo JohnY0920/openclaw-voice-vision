@@ -1,132 +1,80 @@
-# Manufacturing Voice Vision AI
+# 🏭 Manufacturing Voice Vision AI
 
-Real-time voice + visual AI assistant for manufacturing operations via Meta Ray-Ban smart glasses.
+**Real-time voice + visual AI for manufacturing operations via Meta Ray-Ban smart glasses.**
 
-Based on VisionClaw architecture, customized for industrial use cases.
+Inspired by [VisionClaw](https://github.com/sseanliu/VisionClaw) by Sean Liu.
 
-## 🎯 Core Concept
+---
 
-**"See what you see, hear what you say, take action on your behalf"**
+## ✨ What It Does
 
 Workers on the factory floor can:
-- 👁️ **Look** at a product/barcode/label
-- 🗣️ **Ask** questions in natural language
-- ✅ **Get** instant answers from ERP/Databricks data
+
+1. **👁️ Look** at a product, barcode, or label through Meta glasses
+2. **🗣️ Ask** questions in natural language
+3. **✅ Get** instant answers from ERP/Databricks data
+
+### Example Interactions
+
+> *"Scan this barcode"*  
+> → Glasses scan QR → AI looks up SKU → *"Part ABC123, 450 units in stock, Warehouse A"
+
+> *"What's the status of the Acme order?"*  
+> → AI queries production → *"Job #45892, 80% complete, finishing tomorrow 2 PM"
+
+> *"How many hours did I work this week?"*  
+> → AI checks timesheet → *"32 hours logged, 8 hours remaining"
+
+---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                 META RAY-BAN GLASSES                         │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │   Camera    │  │  Microphone │  │   Speaker   │         │
-│  │  (~1 FPS)   │  │  (16 kHz)   │  │  (24 kHz)   │         │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘         │
-└─────────┼────────────────┼────────────────┼─────────────────┘
-          │                │                │
-          └────────────────┴────────────────┘
-                           │
-          ┌────────────────┴────────────────┐
-          ▼                                 ▼
-┌──────────────────────┐      ┌──────────────────────────┐
-│   iOS / ANDROID      │      │   GEMINI LIVE API        │
-│      APP             │◄────►│  (WebSocket)             │
-│                      │      │  • Vision Analysis       │
-│  • DAT SDK           │      │  • Voice Recognition     │
-│  • Camera Stream     │      │  • Natural Language      │
-│  • Audio Pipeline    │      │  • Tool Calling          │
-└──────────┬───────────┘      └────────────┬─────────────┘
-           │                                │
-           │         ┌──────────────────────┘
-           │         │
-           ▼         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   OPENCLAW GATEWAY                           │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │            MANUFACTURING SKILL                         │  │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌──────────────┐    │  │
-│  │  │ Inventory   │ │ Production  │ │   Employee   │    │  │
-│  │  │   Lookup    │ │   Status    │ │    Hours     │    │  │
-│  │  └──────┬──────┘ └──────┬──────┘ └──────┬───────┘    │  │
-│  │         │               │               │            │  │
-│  │         └───────────────┴───────────────┘            │  │
-│  │                         │                            │  │
-│  │                         ▼                            │  │
-│  │              ┌─────────────────────┐                 │  │
-│  │              │  DATABRICKS SQL     │                 │  │
-│  │              │    WAREHOUSE        │                 │  │
-│  │              └─────────────────────┘                 │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  META GLASSES   │────▶│   iOS APP       │────▶│  GEMINI LIVE    │
+│  • Camera       │     │  • DAT SDK      │     │  • Vision       │
+│  • Microphone   │     │  • Audio Pipe   │     │  • Voice        │
+│  • Speaker      │◀────│  • OpenClaw     │◀────│  • Tool Calls   │
+└─────────────────┘     └─────────────────┘     └────────┬────────┘
+                                                         │
+                              ┌──────────────────────────┘
+                              ▼
+                    ┌─────────────────┐
+                    │  OPENCLAW       │
+                    │  • Manufacturing│
+                    │    Skill        │
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    ▼                 ▼
+            ┌──────────────┐  ┌──────────────┐
+            │ DATABRICKS   │  │ ERP/CRM      │
+            │ SQL Warehouse│  │ Systems      │
+            └──────────────┘  └──────────────┘
 ```
 
-## 📱 Supported Hardware
+---
 
-| Device | Status | Notes |
-|--------|--------|-------|
-| **Meta Ray-Ban** | Primary target | Best experience, hands-free |
-| **iPhone** | Dev + Fallback | Use phone camera for testing |
-| **Android** | Planned | DAT SDK available |
+## 📦 What's Included
 
-## 🛠️ Tech Stack
+### iOS Application (`ios-app/`)
+- Full SwiftUI interface
+- Meta DAT SDK integration
+- Gemini Live API connection
+- Audio pipeline (mic + speaker)
+- Camera preview with scanning overlay
 
-| Layer | Technology |
-|-------|-----------|
-| Glasses | Meta Ray-Ban (Wayfarer/Headliner) |
-| Mobile | Swift (iOS) + Meta DAT SDK |
-| AI | Gemini Live API (multimodal) |
-| Gateway | OpenClaw |
-| Data | Databricks SQL Warehouse |
+### OpenClaw Skill (`openclaw-skill/`)
+- Databricks SQL connector
+- Inventory lookup tools
+- Production status queries
+- Employee hours tracking
 
-## 📂 Project Structure
-
-```
-Manufacturing-Voice-Vision/
-├── README.md
-├── ios-app/                      # iOS Application
-│   ├── ManufacturingAI/
-│   │   ├── AppDelegate.swift
-│   │   ├── SceneDelegate.swift
-│   │   ├── ContentView.swift
-│   │   ├── Services/
-│   │   │   ├── GlassesManager.swift      # Meta DAT SDK
-│   │   │   ├── GeminiService.swift       # Gemini Live API
-│   │   │   ├── OpenClawClient.swift      # OpenClaw integration
-│   │   │   └── AudioManager.swift        # Audio pipeline
-│   │   ├── Views/
-│   │   │   ├── MainView.swift
-│   │   │   ├── CameraPreviewView.swift
-│   │   │   └── VoiceIndicatorView.swift
-│   │   └── Utils/
-│   │       ├── Secrets.swift.example
-│   │       └── Constants.swift
-│   ├── Podfile
-│   └── ManufacturingAI.xcodeproj
-├── openclaw-skill/               # OpenClaw Manufacturing Skill
-│   ├── SKILL.md
-│   └── scripts/
-│       ├── databricks_client.py
-│       ├── inventory_tool.py
-│       ├── production_tool.py
-│       └── employee_tool.py
-├── docs/
-│   ├── SETUP.md
-│   ├── API_REFERENCE.md
-│   └── VISIONCLAW_INTEGRATION.md
-└── prototypes/
-    └── camera-test/
-```
+---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Meta Ray-Ban Smart Glasses
-- iPhone with iOS 16+
-- Xcode 15+
-- Gemini API key
-- OpenClaw Gateway running
-
-### 1. Clone Repo
+### 1. Clone
 ```bash
 git clone https://github.com/JohnY0920/manufacturing-voice-vision.git
 cd manufacturing-voice-vision
@@ -136,51 +84,99 @@ cd manufacturing-voice-vision
 ```bash
 cd ios-app
 pod install
-open ManufacturingAI.xcodeproj
+open ManufacturingAI.xcworkspace
 ```
 
-### 3. Configure Secrets
+### 3. Configure
 ```bash
+# iOS Secrets
 cp ManufacturingAI/Utils/Secrets.swift.example ManufacturingAI/Utils/Secrets.swift
-# Edit Secrets.swift with your API keys
+# Edit with your API keys
+
+# OpenClaw Skill
+cd ../openclaw-skill
+cp .env.example .env
+# Edit with Databricks credentials
 ```
 
-### 4. Enable Developer Mode (Meta AI App)
-- Open Meta AI app on iPhone
-- Settings → App Info
-- Tap version number 5 times
-- Enable Developer Mode
+### 4. Run
+- Start OpenClaw Gateway
+- Build & run in Xcode
+- Pair with Meta glasses
+- Start voice session!
 
-### 5. Build & Run
-- Connect iPhone to Mac
-- Select iPhone as target
-- Build and run (Cmd+R)
+See [docs/SETUP.md](docs/SETUP.md) for detailed instructions.
 
-## 🎤 Voice Commands
+---
 
-### Inventory
-- *"What am I looking at?"* → Identifies item, shows stock level
-- *"Scan this barcode"* → Reads QR/barcode, looks up SKU
-- *"How many units of ABC123?"* → Exact inventory count
-- *"Where is item XYZ?"* → Warehouse location
+## 🛠️ Requirements
 
-### Production
-- *"What's the status of job 45892?"* → Job progress
-- *"When will Acme Corp order be ready?"* → Completion estimate
-- *"Show me today's production"* → Daily summary
+| Component | Requirement |
+|-----------|-------------|
+| **Hardware** | Meta Ray-Ban glasses, iPhone, Mac |
+| **iOS** | 16.0+ |
+| **Xcode** | 15.0+ |
+| **APIs** | Gemini API key, OpenClaw, Databricks |
 
-### Employee
-- *"How many hours this week?"* → Personal timesheet
-- *"Who's on night shift?"* → Current roster
+---
+
+## 📁 Project Structure
+
+```
+manufacturing-voice-vision/
+├── ios-app/              # iOS Swift application
+│   ├── ManufacturingAI/
+│   │   ├── Services/     # Core logic (DAT, Gemini, OpenClaw)
+│   │   ├── Views/        # UI components
+│   │   └── Utils/        # Helpers & config
+│   └── Podfile
+├── openclaw-skill/       # Python backend tools
+│   └── scripts/          # Databricks connectors
+└── docs/                 # Documentation
+    └── SETUP.md          # Detailed setup guide
+```
+
+---
+
+## 🎯 Use Cases
+
+| Role | Example Query |
+|------|---------------|
+| **Warehouse Worker** | *"Where is SKU ABC123?"* |
+| **Floor Supervisor** | *"What's today's production?"* |
+| **Quality Inspector** | *"Scan this barcode for specs"* |
+| **Manager** | *"Show overdue jobs"* |
+
+---
 
 ## 🔐 Security
 
-- All API calls over TLS 1.3
+- TLS 1.3 for all connections
 - Credentials in iOS Keychain
 - Role-based access control
-- Audit logging for all queries
+- Audit logging
 - No PII stored on device
+
+---
+
+## 🤝 Credits
+
+- **Architecture:** Based on [VisionClaw](https://github.com/sseanliu/VisionClaw) by Sean Liu
+- **Agent Layer:** [OpenClaw](https://github.com/nichochar/openclaw)
+- **AI:** Google Gemini Live API
+- **Glasses:** Meta Ray-Ban with DAT SDK
+
+---
 
 ## 📄 License
 
-MIT License - Based on VisionClaw by Sean Liu
+MIT License - See LICENSE file
+
+---
+
+## 🚧 Status
+
+**Phase:** Development (Week 1)  
+**Next:** Testing with sample data, ERP integration
+
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for roadmap.
