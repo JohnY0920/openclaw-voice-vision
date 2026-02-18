@@ -11,82 +11,91 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from scripts.mock_databricks import MockDatabricksClient
-from scripts.inventory_lookup import InventoryLookup
-from scripts.production_status import ProductionStatus
+from scripts.mock_data import MOCK_INVENTORY, MOCK_PRODUCTION_JOBS, MOCK_EMPLOYEES
 
 def demo_inventory_lookup():
     """Demo: Look up inventory by SKU"""
     print("\n📦 INVENTORY LOOKUP DEMO")
     print("=" * 50)
     
-    lookup = InventoryLookup(client=MockDatabricksClient())
+    client = MockDatabricksClient()
     
     # Test SKU lookup
     print("\n1. Looking up SKU 'ABC123'...")
-    result = lookup.lookup_by_sku("ABC123")
-    print(f"   Found: {result.get('found')}")
-    print(f"   Description: {result.get('description')}")
-    print(f"   Available: {result.get('quantity_available')} units")
+    result = client.execute_statement("SELECT * FROM inventory WHERE sku = 'ABC123'")
+    if result.get('status', {}).get('state') == 'SUCCEEDED':
+        data = result.get('result', {}).get('data_array', [])
+        if data:
+            row = data[0]
+            print(f"   ✅ Found: {row[1]}")
+            print(f"   📦 Available: {row[4]} units")
+            print(f"   📍 Location: {row[5]}")
     
     # Test barcode lookup
     print("\n2. Looking up barcode '987654321098'...")
-    result = lookup.lookup_by_barcode("987654321098")
-    print(f"   Found: {result.get('found')}")
-    print(f"   SKU: {result.get('sku')}")
-    print(f"   Location: {result.get('location')}")
-    
-    # Test voice response
-    print("\n3. Voice response format:")
-    print(f"   \"{lookup.format_voice_response(result)}\"")
+    result = client.execute_statement("SELECT * FROM inventory WHERE barcode = '987654321098'")
+    if result.get('status', {}).get('state') == 'SUCCEEDED':
+        data = result.get('result', {}).get('data_array', [])
+        if data:
+            row = data[0]
+            print(f"   ✅ Found: {row[0]}")
+            print(f"   📍 Location: {row[5]}")
     
     # Test low stock
-    print("\n4. Low stock items:")
-    result = lookup.get_low_stock_items()
-    if result.get('result', {}).get('data_array'):
-        for row in result['result']['data_array']:
-            print(f"   - {row[0]}: {row[2]} units (reorder at {row[3]})")
+    print("\n3. Low stock items:")
+    result = client.execute_statement("SELECT * FROM inventory WHERE quantity_available <= reorder_point")
+    if result.get('status', {}).get('state') == 'SUCCEEDED':
+        data = result.get('result', {}).get('data_array', [])
+        for row in data:
+            print(f"   ⚠️  {row[0]}: {row[2]} units available")
 
 def demo_production_status():
     """Demo: Check production jobs"""
     print("\n\n🏭 PRODUCTION STATUS DEMO")
     print("=" * 50)
     
-    ps = ProductionStatus(client=MockDatabricksClient())
+    client = MockDatabricksClient()
     
     # Test job lookup
     print("\n1. Checking job 'JOB001'...")
-    result = ps.get_job_status("JOB001")
-    print(f"   Customer: {result.get('customer')}")
-    print(f"   Status: {result.get('status')}")
-    print(f"   Progress: {result.get('quantity_produced')}/{result.get('quantity_ordered')}")
-    
-    # Test voice response
-    print("\n2. Voice response format:")
-    print(f"   \"{ps.format_voice_response(result)}\"")
+    result = client.execute_statement("SELECT * FROM production WHERE job_id = 'JOB001'")
+    if result.get('status', {}).get('state') == 'SUCCEEDED':
+        data = result.get('result', {}).get('data_array', [])
+        if data:
+            row = data[0]
+            print(f"   👤 Customer: {row[1]}")
+            print(f"   📊 Status: {row[6]}")
+            print(f"   📈 Progress: {row[4]}/{row[3]}")
     
     # Test overdue jobs
-    print("\n3. Overdue jobs:")
-    result = ps.get_overdue_jobs()
-    if result.get('result', {}).get('data_array'):
-        for row in result['result']['data_array'][:3]:
-            print(f"   - {row[0]}: {row[1]} (Due: {row[4]})")
+    print("\n2. Overdue jobs:")
+    result = client.execute_statement("SELECT * FROM production WHERE status = 'DELAYED'")
+    if result.get('status', {}).get('state') == 'SUCCEEDED':
+        data = result.get('result', {}).get('data_array', [])
+        for row in data:
+            due_date = row[8] if len(row) > 8 else "Unknown"
+            print(f"   🚨 {row[0]}: {row[1]} - Due: {due_date}")
 
 def demo_full_pipeline():
     """Demo: Simulate the full voice + vision pipeline"""
     print("\n\n🎭 FULL PIPELINE DEMO")
     print("=" * 50)
-    print("\nSimulating: User wearing glasses scans a barcode...")
-    print("\n👤 User: 'Scan this barcode'")
+    print("\n📱 Simulating: User wearing glasses scans a barcode...")
+    print("\n👤 User: 'What am I looking at?'")
     print("🤖 AI: (Processes visual input from camera)")
     print("📷 Camera: Detects barcode '123456789012'")
     print("🔍 Tool Call: inventory_lookup(barcode='123456789012')")
     
-    lookup = InventoryLookup(client=MockDatabricksClient())
-    result = lookup.lookup_by_barcode("123456789012")
-    response = lookup.format_voice_response(result)
+    client = MockDatabricksClient()
+    result = client.execute_statement("SELECT * FROM inventory WHERE barcode = '123456789012'")
     
-    print(f"📊 Database: Returns inventory data")
-    print(f"🔊 AI Response: \"{response}\"")
+    if result.get('status', {}).get('state') == 'SUCCEEDED':
+        data = result.get('result', {}).get('data_array', [])
+        if data:
+            item = data[0]
+            print(f"📊 Database: Returns inventory data")
+            print(f"🔊 AI Response: \"{item[1]}, SKU {item[0]}. {item[4]} units available at {item[5]}.\"")
+    
     print("\n✅ Full pipeline working!")
 
 def main():
@@ -101,7 +110,15 @@ def main():
     
     print("\n\n" + "=" * 50)
     print("✅ All demos completed successfully!")
-    print("\nNext steps:")
+    print("\n📦 Mock Inventory Items:")
+    for item in MOCK_INVENTORY[:3]:
+        print(f"   - {item['sku']}: {item['description']}")
+    
+    print("\n🏭 Mock Production Jobs:")
+    for job in MOCK_PRODUCTION_JOBS[:3]:
+        print(f"   - {job['job_id']}: {job['customer_name']} ({job['status']})")
+    
+    print("\n\nNext steps:")
     print("1. Get Meta glasses for real testing")
     print("2. Get Databricks credentials for real data")
     print("3. Build iOS app in Xcode")

@@ -5,7 +5,7 @@ Use this when you don't have real credentials yet
 """
 
 from typing import Dict, Any, Optional
-from mock_data import MOCK_INVENTORY, MOCK_PRODUCTION_JOBS, MOCK_EMPLOYEES, MOCK_CUSTOMERS
+from scripts.mock_data import MOCK_INVENTORY, MOCK_PRODUCTION_JOBS, MOCK_EMPLOYEES, MOCK_CUSTOMERS
 
 class MockDatabricksClient:
     """Mock client that returns sample data for testing"""
