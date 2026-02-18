@@ -1,29 +1,41 @@
-# 🏭 Manufacturing Voice Vision AI
+# 🔮 OpenClaw Voice Vision
 
-**Real-time voice + visual AI for manufacturing operations via Meta Ray-Ban smart glasses.**
+**Real-time voice + visual AI assistant for Meta Ray-Ban smart glasses.**
 
-Inspired by [VisionClaw](https://github.com/sseanliu/VisionClaw) by Sean Liu.
+Give your OpenClaw agent eyes and ears. See what you see, hear what you say, and take action on your behalf.
+
+Based on [VisionClaw](https://github.com/sseanliu/VisionClaw) by Sean Liu.
 
 ---
 
 ## ✨ What It Does
 
-Workers on the factory floor can:
+Connect your Meta Ray-Ban glasses to OpenClaw for hands-free AI assistance:
 
-1. **👁️ Look** at a product, barcode, or label through Meta glasses
-2. **🗣️ Ask** questions in natural language
-3. **✅ Get** instant answers from ERP/Databricks data
+- **👁️ Visual Understanding** - AI sees through your glasses camera
+- **🗣️ Voice Commands** - Natural language interaction
+- **🛠️ Agent Actions** - Execute any OpenClaw skill
+- **✅ Instant Results** - Search, message, shop, control smart home, and more
 
-### Example Interactions
+### Example Use Cases
 
-> *"Scan this barcode"*  
-> → Glasses scan QR → AI looks up SKU → *"Part ABC123, 450 units in stock, Warehouse A"
+> *"What am I looking at?"*  
+> → AI analyzes the scene and describes it
 
-> *"What's the status of the Acme order?"*  
-> → AI queries production → *"Job #45892, 80% complete, finishing tomorrow 2 PM"
+> *"Search for this on Amazon"*  
+> → Visual product search and price comparison
 
-> *"How many hours did I work this week?"*  
-> → AI checks timesheet → *"32 hours logged, 8 hours remaining"
+> *"Add milk to my shopping list"*  
+> → Updates your todo/shopping list
+
+> *"Send a message to John saying I'll be late"*  
+> → Routes through WhatsApp/Telegram/iMessage
+
+> *"Turn off the living room lights"*  
+> → Smart home control
+
+> *"Check my calendar for tomorrow"*  
+> → Calendar and scheduling
 
 ---
 
@@ -36,39 +48,26 @@ Workers on the factory floor can:
 │  • Microphone   │     │  • Audio Pipe   │     │  • Voice        │
 │  • Speaker      │◀────│  • OpenClaw     │◀────│  • Tool Calls   │
 └─────────────────┘     └─────────────────┘     └────────┬────────┘
-                                                         │
-                              ┌──────────────────────────┘
-                              ▼
-                    ┌─────────────────┐
-                    │  OPENCLAW       │
-                    │  • Manufacturing│
-                    │    Skill        │
-                    └────────┬────────┘
-                             │
-                    ┌────────┴────────┐
-                    ▼                 ▼
-            ┌──────────────┐  ┌──────────────┐
-            │ DATABRICKS   │  │ ERP/CRM      │
-            │ SQL Warehouse│  │ Systems      │
-            └──────────────┘  └──────────────┘
+          │                                              │
+          │                    ┌─────────────────────────┘
+          │                    ▼
+          │          ┌─────────────────┐
+          │          │  OPENCLAW       │
+          │          │  GATEWAY        │
+          │          │                 │
+          │          │  56+ Skills:    │
+          │          │  • Search       │
+          │          │  • Messaging    │
+          │          │  • Shopping     │
+          │          │  • Smart Home   │
+          │          │  • Calendar     │
+          │          │  • Notes        │
+          │          │  • Custom...    │
+          │          └─────────────────┘
+          │                    │
+          └────────────────────┘
+          (Optional: Custom Skills for Enterprise)
 ```
-
----
-
-## 📦 What's Included
-
-### iOS Application (`ios-app/`)
-- Full SwiftUI interface
-- Meta DAT SDK integration
-- Gemini Live API connection
-- Audio pipeline (mic + speaker)
-- Camera preview with scanning overlay
-
-### OpenClaw Skill (`openclaw-skill/`)
-- Databricks SQL connector
-- Inventory lookup tools
-- Production status queries
-- Employee hours tracking
 
 ---
 
@@ -76,27 +75,22 @@ Workers on the factory floor can:
 
 ### 1. Clone
 ```bash
-git clone https://github.com/JohnY0920/manufacturing-voice-vision.git
-cd manufacturing-voice-vision
+git clone https://github.com/JohnY0920/openclaw-voice-vision.git
+cd openclaw-voice-vision
 ```
 
 ### 2. Setup iOS App
 ```bash
 cd ios-app
 pod install
-open ManufacturingAI.xcworkspace
+open OpenClawVoiceVision.xcworkspace
 ```
 
 ### 3. Configure
 ```bash
 # iOS Secrets
-cp ManufacturingAI/Utils/Secrets.swift.example ManufacturingAI/Utils/Secrets.swift
+cp OpenClawVoiceVision/Utils/Secrets.swift.example OpenClawVoiceVision/Utils/Secrets.swift
 # Edit with your API keys
-
-# OpenClaw Skill
-cd ../openclaw-skill
-cp .env.example .env
-# Edit with Databricks credentials
 ```
 
 ### 4. Run
@@ -116,36 +110,38 @@ See [docs/SETUP.md](docs/SETUP.md) for detailed instructions.
 | **Hardware** | Meta Ray-Ban glasses, iPhone, Mac |
 | **iOS** | 16.0+ |
 | **Xcode** | 15.0+ |
-| **APIs** | Gemini API key, OpenClaw, Databricks |
+| **APIs** | Gemini API key, OpenClaw Gateway |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-manufacturing-voice-vision/
-├── ios-app/              # iOS Swift application
-│   ├── ManufacturingAI/
-│   │   ├── Services/     # Core logic (DAT, Gemini, OpenClaw)
-│   │   ├── Views/        # UI components
-│   │   └── Utils/        # Helpers & config
+openclaw-voice-vision/
+├── ios-app/                    # iOS Swift application
+│   ├── OpenClawVoiceVision/
+│   │   ├── Services/           # Core logic (DAT, Gemini, OpenClaw)
+│   │   ├── Views/              # UI components
+│   │   └── Utils/              # Helpers & config
 │   └── Podfile
-├── openclaw-skill/       # Python backend tools
-│   └── scripts/          # Databricks connectors
-└── docs/                 # Documentation
-    └── SETUP.md          # Detailed setup guide
+├── openclaw-skill/             # Optional: Custom skills
+│   └── scripts/                # Your custom tools
+└── docs/                       # Documentation
+    └── SETUP.md
 ```
 
 ---
 
 ## 🎯 Use Cases
 
-| Role | Example Query |
-|------|---------------|
-| **Warehouse Worker** | *"Where is SKU ABC123?"* |
-| **Floor Supervisor** | *"What's today's production?"* |
-| **Quality Inspector** | *"Scan this barcode for specs"* |
-| **Manager** | *"Show overdue jobs"* |
+| Category | Example Commands |
+|----------|-----------------|
+| **Shopping** | *"Search for this on Amazon"*, *"Compare prices"* |
+| **Messaging** | *"Send a message to John"*, *"Reply to Sarah"* |
+| **Smart Home** | *"Turn off the lights"*, *"Set thermostat to 72"* |
+| **Search** | *"What am I looking at?"*, *"Search the web for this"* |
+| **Productivity** | *"Add to my shopping list"*, *"Set a reminder"* |
+| **Enterprise** | *"Check inventory"*, *"Look up customer"* (custom skills) |
 
 ---
 
@@ -153,15 +149,14 @@ manufacturing-voice-vision/
 
 - TLS 1.3 for all connections
 - Credentials in iOS Keychain
-- Role-based access control
-- Audit logging
-- No PII stored on device
+- No data stored on device
+- All actions go through your OpenClaw Gateway
 
 ---
 
 ## 🤝 Credits
 
-- **Architecture:** Based on [VisionClaw](https://github.com/sseanliu/VisionClaw) by Sean Liu
+- **Based on:** [VisionClaw](https://github.com/sseanliu/VisionClaw) by Sean Liu
 - **Agent Layer:** [OpenClaw](https://github.com/nichochar/openclaw)
 - **AI:** Google Gemini Live API
 - **Glasses:** Meta Ray-Ban with DAT SDK
@@ -177,6 +172,6 @@ MIT License - See LICENSE file
 ## 🚧 Status
 
 **Phase:** Development (Week 1)  
-**Next:** Testing with sample data, ERP integration
+**Next:** Testing, skill integration
 
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for roadmap.
+This is an open-source project. Contributions welcome!
